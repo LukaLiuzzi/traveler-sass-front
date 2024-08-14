@@ -111,10 +111,7 @@ export const logIn = async (prevState: any, formData: FormData) => {
       }),
       { httpOnly: true },
     );
-
-    redirect("/dashboard");
   } catch (error) {
-    console.error(error);
-    return { message: "Credenciales invalidas" };
+    return { message: "Ocurrio un error inesperado" };
   }
 };
