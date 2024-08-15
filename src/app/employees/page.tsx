@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "Lista de empleados de la empresa",
 };
 
-const allowedRoles = ["tenant", "admin"];
+const allowedRoles = ["superAdmin", "tenant", "admin"];
 
 export default async function Page({
   searchParams,
