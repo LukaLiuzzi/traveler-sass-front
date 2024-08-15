@@ -5,6 +5,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import LoginForm from "@/components/Auth/LoginForm";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: `Inicio de sesion | ${process.env.NEXT_PUBLIC_APP_NAME}`,
@@ -12,6 +14,15 @@ export const metadata: Metadata = {
 };
 
 const SignIn: React.FC = () => {
+  const cookieStore = cookies();
+
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
+
+  if (accessToken && refreshToken) {
+    redirect("/");
+  }
+
   return (
     <div className="h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="flex flex-wrap items-center">
