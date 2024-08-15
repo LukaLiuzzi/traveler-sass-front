@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Link from "next/link";
 import SearchBar from "@/components/Search/SearchBar";
-import { getEmployees } from "../lib/actions";
+import { checkRole, getEmployees } from "../lib/actions";
 import { Suspense } from "react";
 import EmployeesTableSkeleton from "@/components/Tables/EmployeesTableSkeleton";
 import EmployeesTable from "@/components/Tables/EmployeesTable";
@@ -26,13 +26,7 @@ export default async function Page({
     page?: string;
   };
 }) {
-  const cookieStore = cookies();
-  const user = cookieStore.get("user")?.value;
-  const parsedUser = user ? JSON.parse(user) : null;
-  if (!parsedUser || !allowedRoles.includes(parsedUser.role)) {
-    // TODO ARREGLAR ERROR EN LA CONSOLA
-    return redirect("/");
-  }
+  await checkRole(allowedRoles, "/auth/signin");
 
   const currentPage = Number(searchParams?.page) || 1;
   const search = searchParams?.search || "";

@@ -16,9 +16,6 @@ export const logIn = async (prevState: any, formData: FormData) => {
     password: formData.get("password") as string,
   });
 
-  // TODO: Remove this timeout
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-
   // Return early if the form data is invalid
   if (!validatedFields.success) {
     return {
@@ -170,5 +167,15 @@ export const getEmployees = async ({
     return { data, success: true };
   } catch (error) {
     return { message: "Ocurrio un error inesperado", success: false };
+  }
+};
+
+export const checkRole = async (roles: string[], pathToRedirect: string) => {
+  const cookieStore = cookies();
+  const user = cookieStore.get("user")?.value;
+  const parsedUser = user ? JSON.parse(user) : null;
+  if (!parsedUser || !roles.includes(parsedUser.role)) {
+    console.log("redirecting");
+    return redirect(pathToRedirect);
   }
 };

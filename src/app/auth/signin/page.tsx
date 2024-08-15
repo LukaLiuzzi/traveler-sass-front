@@ -4,9 +4,6 @@ import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import { logIn } from "@/app/lib/actions";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import LoginForm from "@/components/Auth/LoginForm";
 
 export const metadata: Metadata = {
@@ -15,14 +12,6 @@ export const metadata: Metadata = {
 };
 
 const SignIn: React.FC = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
-  const refreshToken = cookieStore.get("refreshToken")?.value;
-
-  if (accessToken && refreshToken) {
-    redirect("/");
-  }
-
   return (
     <div className="h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="flex flex-wrap items-center">
