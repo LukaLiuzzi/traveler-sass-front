@@ -74,8 +74,8 @@ export default async function Page({ params }: { params: { id: string } }) {
                     employee?.status === "active"
                       ? "bg-success text-success"
                       : employee?.status === "inactive"
-                        ? "bg-danger text-danger"
-                        : "bg-warning text-warning"
+                        ? "bg-warning text-warning"
+                        : "bg-danger text-danger"
                   }`}
                 >
                   {employee?.status === "active"
