@@ -50,7 +50,7 @@ const EmployeesTable = async ({ search, page = 1 }: TableThreeProps) => {
                       <h5 className="font-medium text-black dark:text-white">
                         {employee.name} {employee.lastName}
                       </h5>
-                      <p className="text-sm">${employee.email}</p>
+                      <p className="text-sm">{employee.email}</p>
                     </td>
                     <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                       <p className="text-black dark:text-white">
