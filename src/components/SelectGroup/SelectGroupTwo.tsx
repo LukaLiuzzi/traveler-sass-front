@@ -1,8 +1,27 @@
 "use client";
 import React, { useState } from "react";
 
-const SelectGroupTwo: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<string>("");
+type Option = {
+  value: string;
+  label: string;
+};
+
+type SelectGroupTwoProps = {
+  title: string;
+  options: Option[];
+  defaultValue?: string;
+  name: string;
+};
+
+const SelectGroupTwo = ({
+  title,
+  options,
+  defaultValue,
+  name,
+}: SelectGroupTwoProps) => {
+  const [selectedOption, setSelectedOption] = useState<string>(
+    defaultValue || "",
+  );
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
   const changeTextColor = () => {
@@ -12,11 +31,11 @@ const SelectGroupTwo: React.FC = () => {
   return (
     <div>
       <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-        Select Country
+        {title}
       </label>
 
       <div className="relative z-20 bg-white dark:bg-form-input">
-        <span className="absolute left-4 top-1/2 z-30 -translate-y-1/2">
+        {/* <span className="absolute left-4 top-1/2 z-30 -translate-y-1/2">
           <svg
             width="20"
             height="20"
@@ -45,10 +64,11 @@ const SelectGroupTwo: React.FC = () => {
               ></path>
             </g>
           </svg>
-        </span>
+        </span> */}
 
         <select
           value={selectedOption}
+          name={name}
           onChange={(e) => {
             setSelectedOption(e.target.value);
             changeTextColor();
@@ -57,18 +77,19 @@ const SelectGroupTwo: React.FC = () => {
             isOptionSelected ? "text-black dark:text-white" : ""
           }`}
         >
-          <option value="" disabled className="text-body dark:text-bodydark">
-            Select Country
-          </option>
-          <option value="USA" className="text-body dark:text-bodydark">
-            USA
-          </option>
-          <option value="UK" className="text-body dark:text-bodydark">
-            UK
-          </option>
-          <option value="Canada" className="text-body dark:text-bodydark">
-            Canada
-          </option>
+          {options.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              className={`text-black dark:text-white ${
+                option.value === defaultValue
+                  ? "bg-meta-4 text-white dark:bg-meta-9 dark:text-meta-4"
+                  : ""
+              }`}
+            >
+              {option.label} {option.value === defaultValue && "(actual)"}
+            </option>
+          ))}
         </select>
 
         <span className="absolute right-4 top-1/2 z-10 -translate-y-1/2">

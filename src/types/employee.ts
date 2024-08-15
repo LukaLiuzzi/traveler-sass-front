@@ -9,4 +9,5 @@ export type Employee = {
   status: "active" | "inactive" | "deleted";
   role: "admin" | "support" | "sales" | "finance";
   tenantId: string;
+  phone?: string;
 };

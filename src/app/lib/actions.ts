@@ -1,6 +1,7 @@
 "use server";
 
 import { Employee } from "@/types/employee";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -111,7 +112,7 @@ export const logIn = async (prevState: any, formData: FormData) => {
       { httpOnly: true },
     );
 
-    return { success: true };
+    redirect("/");
   } catch (error) {
     return { message: "Ocurrio un error inesperado", success: false };
   }
@@ -157,7 +158,7 @@ export const getEmployees = async ({
 
     if (!response.ok) {
       if (response.status === 401) {
-        redirect("/login");
+        redirect("/auth/signin");
       }
       return { message: "Ocurrio un error inesperado", success: false };
     }
@@ -177,5 +178,82 @@ export const checkRole = async (roles: string[], pathToRedirect: string) => {
   if (!parsedUser || !roles.includes(parsedUser.role)) {
     console.log("redirecting");
     return redirect(pathToRedirect);
+  }
+};
+
+export const updateEmployee = async (
+  prevState: {
+    message: string;
+    success: boolean | null;
+  },
+  formData: FormData,
+) => {
+  const cookieStore = cookies();
+  const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+
+  const rawForm = {
+    _id: formData.get("id"),
+    email: formData.get("email"),
+    name: formData.get("name"),
+    lastName: formData.get("lastName"),
+    status: formData.get("status"),
+    role: formData.get("role"),
+    phone: formData.get("phone"),
+  };
+
+  // Validar campos con zod
+  const employeeSchema = z.object({
+    email: z.string().email().optional(),
+    password: z.string().min(6).optional(),
+    name: z.string().optional(),
+    lastName: z.string().optional(),
+    phone: z.string().optional(),
+    role: z.enum(["admin", "support", "sales", "finance"]).optional(),
+    status: z.enum(["active", "inactive", "deleted"]).optional(),
+  });
+
+  const validatedFields = employeeSchema.safeParse(rawForm);
+
+  // Return early if the form data is invalid
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Ingrese los campos correctamente",
+      success: false,
+    };
+  }
+
+  try {
+    const response = await fetch(
+      `${process.env.API_URL}/employees/${rawForm._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: cookiesList,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          ...rawForm,
+          tenantId: process.env.TENANT_ID,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirect("/auth/signin");
+      }
+      return { message: "Ocurrio un error inesperado", success: false };
+    }
+
+    revalidatePath(`/employees`);
+
+    return { success: true, message: "Empleado editado correctamente" };
+  } catch (error) {
+    console.log("ERROR", error);
+    return { message: "Ocurrio un error inesperado", success: false };
+  } finally {
+    redirect("/employees");
   }
 };
