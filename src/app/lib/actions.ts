@@ -1,5 +1,6 @@
 "use server";
 
+import { Employee } from "@/types/employee";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -23,6 +24,7 @@ export const logIn = async (prevState: any, formData: FormData) => {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Ingrese las credenciales correctamente",
+      success: false,
     };
   }
 
@@ -40,13 +42,13 @@ export const logIn = async (prevState: any, formData: FormData) => {
     });
 
     if (!response.ok) {
-      return { message: "Credenciales invalidas" };
+      return { message: "Credenciales invalidas", success: false };
     }
 
     const responseCookiesString = response.headers.get("set-cookie");
 
     if (!responseCookiesString) {
-      return { message: "Credenciales invalidas" };
+      return { message: "Credenciales invalidas", success: false };
     }
 
     // 1h
@@ -111,7 +113,62 @@ export const logIn = async (prevState: any, formData: FormData) => {
       }),
       { httpOnly: true },
     );
+
+    return { success: true };
   } catch (error) {
-    return { message: "Ocurrio un error inesperado" };
+    return { message: "Ocurrio un error inesperado", success: false };
+  }
+};
+
+export const getEmployees = async ({
+  search,
+  page = 1,
+  limit = 10,
+}: {
+  search: string;
+  page: number;
+  limit: number;
+}): Promise<{
+  success: boolean;
+  message?: string;
+  data?: {
+    docs: Employee[];
+    totalDocs: number;
+    limit: number;
+    totalPages: number;
+    page: number;
+    pagingCounter: number;
+    hasPrevPage: boolean;
+    hasNextPage: boolean;
+    prevPage: number | null;
+    nextPage: number | null;
+  };
+}> => {
+  const cookieStore = cookies();
+  const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+  try {
+    const response = await fetch(
+      `${process.env.API_URL}/employees?search=${search}&page=${page}&limit=${limit}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          cookie: cookiesList,
+        },
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirect("/login");
+      }
+      return { message: "Ocurrio un error inesperado", success: false };
+    }
+
+    const data = await response.json();
+
+    return { data, success: true };
+  } catch (error) {
+    return { message: "Ocurrio un error inesperado", success: false };
   }
 };

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import { logIn } from "@/app/actions";
+import { logIn } from "@/app/lib/actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LoginForm from "@/components/Auth/LoginForm";
