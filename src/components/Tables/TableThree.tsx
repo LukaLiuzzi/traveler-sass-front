@@ -52,8 +52,8 @@ const TableThree = async ({ search, page = 1 }: TableThreeProps) => {
                       employee.status === "active"
                         ? "bg-success text-success"
                         : employee.status === "inactive"
-                          ? "bg-danger text-danger"
-                          : "bg-warning text-warning"
+                          ? "bg-warning text-warning"
+                          : "bg-danger text-danger"
                     }`}
                   >
                     {employee.status}

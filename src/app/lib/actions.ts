@@ -257,3 +257,40 @@ export const updateEmployee = async (
     redirect("/employees");
   }
 };
+
+export const deleteEmployee = async (
+  formData: FormData,
+): Promise<{ success: boolean; message?: string }> => {
+  const cookieStore = cookies();
+  const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+
+  const id = formData.get("id");
+
+  if (!id) {
+    return { message: "Ocurrio un error inesperado", success: false };
+  }
+
+  try {
+    const response = await fetch(`${process.env.API_URL}/employees/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookiesList,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirect("/auth/signin");
+      }
+      return { message: "Ocurrio un error inesperado", success: false };
+    }
+
+    revalidatePath(`/employees`);
+
+    return { success: true, message: "Empleado eliminado correctamente" };
+  } catch (error) {
+    return { message: "Ocurrio un error inesperado", success: false };
+  }
+};

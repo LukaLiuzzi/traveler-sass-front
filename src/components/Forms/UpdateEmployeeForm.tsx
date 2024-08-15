@@ -24,6 +24,7 @@ const employeeRoles = [
 const userStatus = [
   { value: "active", label: "Activo" },
   { value: "inactive", label: "Inactivo" },
+  { value: "deleted", label: "Eliminado" },
 ];
 
 const UpdateEmployeeForm = ({ employee }: UpdateEmployeeFormProps) => {
