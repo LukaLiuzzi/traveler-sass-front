@@ -79,7 +79,13 @@ const menuGroups = [
         ),
         label: "Empleados",
         route: "#",
-        children: [{ label: "Lista de empleados", route: "/employees" }],
+        children: [
+          { label: "Lista de empleados", route: "/employees" },
+          {
+            label: "Agregar un empleado",
+            route: "/employees/create",
+          },
+        ],
       },
       {
         icon: (

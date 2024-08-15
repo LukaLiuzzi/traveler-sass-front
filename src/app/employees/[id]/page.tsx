@@ -10,8 +10,8 @@ import { updateEmployee } from "@/app/lib/actions";
 import UpdateEmployeeForm from "@/components/Forms/UpdateEmployeeForm";
 
 export const metadata: Metadata = {
-  title: `Información de usuario | ${process.env.NEXT_PUBLIC_TENANT_NAME}`,
-  description: "Informacion personal del usuario",
+  title: `Información del empleado | ${process.env.NEXT_PUBLIC_TENANT_NAME}`,
+  description: "Informacion del empleado",
 };
 
 type GetEmployeeResult = {
