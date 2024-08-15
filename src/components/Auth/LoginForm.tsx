@@ -2,7 +2,6 @@
 
 import { useActionState } from "react";
 import { logIn } from "@/app/lib/actions";
-import { useRouter } from "next/navigation";
 
 const initialState = {
   message: "",
@@ -10,12 +9,7 @@ const initialState = {
 };
 
 const LoginForm = () => {
-  const router = useRouter();
   const [state, formAction, pending] = useActionState(logIn, initialState);
-
-  if (state?.success === true) {
-    router.replace("/");
-  }
 
   return (
     <form action={formAction}>
