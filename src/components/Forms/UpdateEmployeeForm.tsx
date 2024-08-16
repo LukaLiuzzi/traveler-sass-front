@@ -169,7 +169,7 @@ const UpdateEmployeeForm = ({ employee }: UpdateEmployeeFormProps) => {
             </div>
           </div>
 
-          <div className="w-full pl-2.5 sm:w-1/2">
+          <div className="w-full sm:w-1/2">
             <label
               className="mb-3 block text-sm font-medium text-black dark:text-white"
               htmlFor="phone"
