@@ -240,6 +240,7 @@ export const updateEmployee = async (
       },
     );
 
+    status = response.status;
     if (!response.ok) {
       if (response.status === 401) {
         redirect("/auth/signin");
