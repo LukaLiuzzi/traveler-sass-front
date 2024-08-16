@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 //TODO: Add allowed roles
-const allowedRoles = ["superAdmin", "tenant", "admin"];
+const allowedRoles = ["superAdmin", "tenant", "admin", "support", "finance"];
 
 export default async function Page({
   searchParams,
