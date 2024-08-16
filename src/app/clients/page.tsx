@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Link from "next/link";
 import SearchBar from "@/components/Search/SearchBar";
-import { checkRole, getEmployees, deleteEmployee } from "../lib/actions";
+import { checkRole, deleteClient, getClients } from "../lib/actions";
 import { Suspense } from "react";
 import UsersDataTableSkeleton from "@/components/Tables/UsersDataTableSkeleton";
 import UsersDataTable from "@/components/Tables/UsersDataTable";
@@ -12,10 +12,11 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: `Lista de empleados | ${process.env.NEXT_PUBLIC_TENANT_NAME}`,
-  description: "Lista de empleados de la empresa",
+  title: `Lista de clientes | ${process.env.NEXT_PUBLIC_TENANT_NAME}`,
+  description: "Lista de clientes",
 };
 
+//TODO: Add allowed roles
 const allowedRoles = ["superAdmin", "tenant", "admin"];
 
 export default async function Page({
@@ -47,13 +48,13 @@ export default async function Page({
           search={search}
           page={currentPage}
           getData={() =>
-            getEmployees({
+            getClients({
               search,
               page: currentPage,
               limit: 10,
             })
           }
-          deleteData={deleteEmployee}
+          deleteData={deleteClient}
         />
       </Suspense>
     </DefaultLayout>

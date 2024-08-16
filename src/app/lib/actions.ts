@@ -390,3 +390,76 @@ export const createEmployee = async (
     }
   }
 };
+
+export const getClients = async ({
+  search,
+  page = 1,
+  limit = 10,
+}: {
+  search: string;
+  page: number;
+  limit: number;
+}) => {
+  const cookieStore = cookies();
+  const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+  try {
+    const response = await fetch(
+      `${process.env.API_URL}/clients?search=${search}&page=${page}&limit=${limit}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          cookie: cookiesList,
+        },
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirect("/auth/signin");
+      }
+      return { message: "Ocurrio un error inesperado", success: false };
+    }
+
+    const data = await response.json();
+
+    return { data, success: true };
+  } catch (error) {
+    return { message: "Ocurrio un error inesperado", success: false };
+  }
+};
+
+export const deleteClient = async (formData: FormData) => {
+  const cookieStore = cookies();
+  const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+
+  const id = formData.get("id");
+
+  if (!id) {
+    return { message: "Ocurrio un error inesperado", success: false };
+  }
+
+  try {
+    const response = await fetch(`${process.env.API_URL}/clients/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookiesList,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirect("/auth/signin");
+      }
+      return { message: "Ocurrio un error inesperado", success: false };
+    }
+
+    revalidatePath(`/clients`);
+
+    return { success: true, message: "Cliente eliminado correctamente" };
+  } catch (error) {
+    return { message: "Ocurrio un error inesperado", success: false };
+  }
+};
