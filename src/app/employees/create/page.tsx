@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Employee } from "@/types/employee";
 import SelectGroupTwo from "@/components/SelectGroup/SelectGroupTwo";
-import { updateEmployee } from "@/app/lib/actions";
+import { checkRole, updateEmployee } from "@/app/lib/actions";
 import UpdateEmployeeForm from "@/components/Forms/UpdateEmployeeForm";
 import CreateEmployeeForm from "@/components/Forms/CreateEmployeeForm";
 
@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
+  await checkRole(["superAdmin", "tenant"], "/");
+
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-270">
