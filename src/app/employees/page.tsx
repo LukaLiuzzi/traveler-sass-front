@@ -37,7 +37,7 @@ export default async function Page({
         Lista de empleados
       </h1>
       <div className="mx-auto mb-10 max-w-[400px] text-black dark:text-white">
-        <SearchBar placeholder="Buscar por nombre, email o rol" />
+        <SearchBar placeholder="Buscar por nombre o email" />
       </div>
       <Suspense
         key={search + currentPage}
