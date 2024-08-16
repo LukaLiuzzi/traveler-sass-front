@@ -1,4 +1,4 @@
-import { deleteEmployee, getEmployees } from "@/app/lib/actions";
+import { deleteEmployee } from "@/app/lib/actions";
 import { Employee } from "@/types/employee";
 import Pagination from "../Pagination/Pagination";
 import Link from "next/link";
@@ -6,10 +6,20 @@ import Link from "next/link";
 interface TableThreeProps {
   search: string;
   page?: number;
+  getData?: ({}) => any;
+  deleteData?: (formData: FormData) => any;
 }
 
-const EmployeesTable = async ({ search, page = 1 }: TableThreeProps) => {
-  const { data, success, message } = await getEmployees({
+const EmployeesTable = async ({
+  search,
+  page = 1,
+  getData,
+  deleteData,
+}: TableThreeProps) => {
+  if (!getData) {
+    return;
+  }
+  const { data, success, message } = await getData({
     search,
     page,
     limit: 10,
@@ -37,45 +47,47 @@ const EmployeesTable = async ({ search, page = 1 }: TableThreeProps) => {
             </thead>
             <tbody>
               {data?.docs
-                ?.sort((a: Employee, b: Employee) => {
+                ?.sort((a: any, b: any) => {
                   if (a.status === "deleted" && b.status !== "deleted")
                     return 1;
                   if (a.status !== "deleted" && b.status === "deleted")
                     return -1;
                   return 0;
                 })
-                .map((employee: Employee) => (
-                  <tr key={employee._id}>
+                .map((element: any) => (
+                  <tr key={element?._id}>
                     <td className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                       <h5 className="font-medium text-black dark:text-white">
-                        {employee.name} {employee.lastName}
+                        {element?.name} {element?.lastName}
                       </h5>
-                      <p className="text-sm">{employee.email}</p>
+                      <p className="text-sm">{element?.email}</p>
                     </td>
                     <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                       <p className="text-black dark:text-white">
-                        {employee.role.toLocaleLowerCase() === "admin"
+                        {element?.role.toLocaleLowerCase() === "admin"
                           ? "Administrador"
-                          : employee.role.toLocaleLowerCase() === "support"
+                          : element?.role.toLocaleLowerCase() === "support"
                             ? "Soporte"
-                            : employee.role.toLocaleLowerCase() === "sales"
+                            : element?.role.toLocaleLowerCase() === "sales"
                               ? "Ventas"
-                              : "Finanzas"}
+                              : element?.role.toLocaleLowerCase() === "finance"
+                                ? "Finanzas"
+                                : "Cliente"}
                       </p>
                     </td>
                     <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                       <p
                         className={`inline-flex rounded-full bg-opacity-10 px-3 py-1 text-sm font-medium ${
-                          employee.status === "active"
+                          element?.status === "active"
                             ? "bg-success text-success"
-                            : employee.status === "inactive"
+                            : element?.status === "inactive"
                               ? "bg-warning text-warning"
                               : "bg-danger text-danger"
                         }`}
                       >
-                        {employee?.status === "active"
+                        {element?.status === "active"
                           ? "Activo"
-                          : employee?.status === "inactive"
+                          : element?.status === "inactive"
                             ? "Inactivo"
                             : "Eliminado"}
                       </p>
@@ -83,7 +95,7 @@ const EmployeesTable = async ({ search, page = 1 }: TableThreeProps) => {
                     <td className="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                       <div className="flex items-center space-x-3.5">
                         <Link
-                          href={`/employees/${employee._id}`}
+                          href={`/employees/${element._id}`}
                           className="flex items-center justify-center"
                         >
                           <button className="hover:text-primary">
@@ -108,10 +120,10 @@ const EmployeesTable = async ({ search, page = 1 }: TableThreeProps) => {
                         </Link>
 
                         <form
-                          action={deleteEmployee}
+                          action={deleteData}
                           className="flex items-center justify-center"
                         >
-                          <input type="hidden" value={employee._id} name="id" />
+                          <input type="hidden" value={element._id} name="id" />
                           <button className="hover:text-primary" type="submit">
                             <svg
                               className="fill-current"
