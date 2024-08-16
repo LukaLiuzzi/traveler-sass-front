@@ -50,8 +50,7 @@ export const logIn = async (prevState: any, formData: FormData) => {
     }
 
     // 1h
-    const accessTokenCookieTimeExpire =
-      new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
+    const accessTokenCookieTimeExpire = new Date().getTime() + 60 * 60 * 1000;
 
     // 7d
     const refreshTokenCookieTimeExpire =
@@ -174,9 +173,9 @@ export const getEmployees = async ({
 export const checkRole = async (roles: string[], pathToRedirect: string) => {
   const cookieStore = cookies();
   const user = cookieStore.get("user")?.value;
+
   const parsedUser = user ? JSON.parse(user) : null;
   if (!parsedUser || !roles.includes(parsedUser.role)) {
-    console.log("redirecting");
     return redirect(pathToRedirect);
   }
 };
@@ -190,6 +189,7 @@ export const updateEmployee = async (
 ) => {
   const cookieStore = cookies();
   const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+  let status;
 
   const rawForm = {
     _id: formData.get("id"),
@@ -254,7 +254,9 @@ export const updateEmployee = async (
     console.log("ERROR", error);
     return { message: "Ocurrio un error inesperado", success: false };
   } finally {
-    redirect("/employees");
+    if (status === 200) {
+      redirect("/employees");
+    }
   }
 };
 
@@ -292,5 +294,99 @@ export const deleteEmployee = async (
     return { success: true, message: "Empleado eliminado correctamente" };
   } catch (error) {
     return { message: "Ocurrio un error inesperado", success: false };
+  }
+};
+
+export const createEmployee = async (
+  prevState: {
+    message: string;
+    success: boolean | null;
+  },
+  formData: FormData,
+): Promise<{
+  success: boolean;
+  message?: string;
+  errors?: Record<string, string[]>;
+}> => {
+  const cookieStore = cookies();
+  const cookiesList = `accessToken=${cookieStore.get("accessToken")?.value}; refreshToken=${cookieStore.get("refreshToken")?.value}`;
+  let status;
+
+  const rawForm = {
+    email: formData.get("email"),
+    name: formData.get("name"),
+    lastName: formData.get("lastName"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+    status: formData.get("status"),
+    role: formData.get("role"),
+    phone: formData.get("phone"),
+  };
+
+  // Validar campos con zod
+
+  const employeeSchema = z.object({
+    email: z.string().email(),
+    password: z.string(),
+    confirmPassword: z.string(),
+    name: z.string(),
+    lastName: z.string(),
+    phone: z.string(),
+    role: z.enum(["admin", "support", "sales", "finance"]),
+    status: z.enum(["active", "inactive", "deleted"]),
+  });
+
+  const validatedFields = employeeSchema.safeParse(rawForm);
+
+  // Return early if the form data is invalid
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Ingrese los campos correctamente",
+      success: false,
+    };
+  }
+
+  if (rawForm.password !== rawForm.confirmPassword) {
+    return {
+      message: "Las contraseñas no coinciden",
+      success: false,
+    };
+  }
+
+  try {
+    const response = await fetch(
+      `${process.env.API_URL}/auth/register/employee`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: cookiesList,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          ...rawForm,
+          tenantId: process.env.TENANT_ID,
+        }),
+      },
+    );
+
+    status = response.status;
+    if (!response.ok) {
+      if (response.status === 401) {
+        redirect("/auth/signin");
+      }
+      return { message: "Ocurrio un error inesperado", success: false };
+    }
+
+    revalidatePath(`/employees`);
+
+    return { success: true, message: "Empleado creado correctamente" };
+  } catch (error) {
+    return { message: "Ocurrio un error inesperado", success: false };
+  } finally {
+    if (status === 201) {
+      redirect("/employees");
+    }
   }
 };

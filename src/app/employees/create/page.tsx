@@ -8,6 +8,7 @@ import { Employee } from "@/types/employee";
 import SelectGroupTwo from "@/components/SelectGroup/SelectGroupTwo";
 import { updateEmployee } from "@/app/lib/actions";
 import UpdateEmployeeForm from "@/components/Forms/UpdateEmployeeForm";
+import CreateEmployeeForm from "@/components/Forms/CreateEmployeeForm";
 
 export const metadata: Metadata = {
   title: `Agregar un empleado | ${process.env.NEXT_PUBLIC_TENANT_NAME}`,
@@ -17,7 +18,23 @@ export const metadata: Metadata = {
 export default async function Page() {
   return (
     <DefaultLayout>
-      <h1>CREAR EMPLEADO</h1>
+      <div className="mx-auto max-w-270">
+        <div className="grid grid-cols-5 gap-8">
+          <div className="col-span-5">
+            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              <div className="flex items-center justify-between border-b border-stroke px-7 py-4 dark:border-strokedark">
+                <h3 className="font-medium text-black dark:text-white">
+                  Agregar un empleado
+                </h3>
+              </div>
+
+              <div className="p-7">
+                <CreateEmployeeForm />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </DefaultLayout>
   );
 }
